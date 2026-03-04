@@ -13,5 +13,9 @@ if(SHARED_CUDART)
     set(CMAKE_CUDA_RUNTIME_LIBRARY "Shared")
 endif()
 
-add_subdirectory(cuda)
+find_package(CUDAToolkit REQUIRED)
+find_package(OpenMP REQUIRED)
 
+
+add_subdirectory(cuda)
+add_subdirectory(openmp)

@@ -1,0 +1,13 @@
+add_executable(omp_euler3d euler3d_cpu.cpp)
+target_compile_definitions(omp_euler3d PRIVATE block_length=8)
+
+add_executable(omp_euler3d_double euler3d_cpu_double.cpp)
+target_compile_definitions(omp_euler3d_double PRIVATE block_length=8)
+
+
+add_executable(omp_pre_euler3d pre_euler3d_cpu.cpp)
+target_compile_definitions(omp_pre_euler3d PRIVATE block_length=8)
+
+
+add_executable(omp_pre_euler3d_double pre_euler3d_cpu_double.cpp)
+target_compile_definitions(omp_pre_euler3d_double PRIVATE block_length=8)
