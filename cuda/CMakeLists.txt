@@ -1,6 +1,8 @@
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/cuda)
 
-# Use deprecated CUDA functions
+if(SHARED_CUDART)
+    set(CMAKE_CUDA_RUNTIME_LIBRARY "Shared")
+endif()
 
 add_subdirectory(b+tree)
 add_subdirectory(backprop)

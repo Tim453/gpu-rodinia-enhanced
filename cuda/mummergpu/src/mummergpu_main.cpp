@@ -1,6 +1,7 @@
 #include <fstream>
 #include <stdint.h>
 #include <stdio.h>
+#include <string>
 #include <unistd.h>
 
 #define int2 int32_t
@@ -104,7 +105,16 @@ void ParseCommandLine(int argc, char **argv) {
   }
 
   if ((optind != argc - 2) || errflg) {
-    printUsage();
+    static std::string default_ref_s, default_qry_s;
+    std::string src_dir(__FILE__);
+    src_dir = src_dir.substr(0, src_dir.rfind('/'));
+    default_ref_s = src_dir + "/../../data/mummergpu/NC_003997.fna";
+    default_qry_s = src_dir + "/../../data/mummergpu/NC_003997_q100bp.fna";
+    OPT_reffilename = const_cast<char *>(default_ref_s.c_str());
+    OPT_qryfilename = const_cast<char *>(default_qry_s.c_str());
+  } else {
+    OPT_reffilename = argv[optind++];
+    OPT_qryfilename = argv[optind++];
   }
 
   if (!OPT_maxmatch) {
@@ -115,9 +125,6 @@ void ParseCommandLine(int argc, char **argv) {
     fprintf(stderr, "ERROR: Reverse (-r) and Forward & Reverse (-b) specified\n");
     exit(1);
   }
-
-  OPT_reffilename = argv[optind++];
-  OPT_qryfilename = argv[optind++];
 }
 
 int main(int argc, char *argv[]) {

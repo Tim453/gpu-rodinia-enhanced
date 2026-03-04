@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
   sdkCreateTimer(&cpuTimer);
   int numElements = 0;
   // Number of elements in the test bed
-  if (strcmp(argv[1], "r") == 0) {
+  if (argc < 2 || strcmp(argv[1], "r") == 0) {
     numElements = SIZE;
   } else {
     FILE *fp;
@@ -89,7 +89,7 @@ int main(int argc, char **argv) {
 
   float datamin = FLT_MAX;
   float datamax = -FLT_MAX;
-  if (strcmp(argv[1], "r") == 0) {
+  if (argc < 2 || strcmp(argv[1], "r") == 0) {
     for (int i = 0; i < numElements; i++) {
       // Generate random floats between 0 and 1 for the input data
       cpu_idata[i] = ((float)rand() / RAND_MAX);

@@ -6,6 +6,7 @@
 #include <helper_cuda.h>
 #include <helper_timer.h>
 #include <iostream>
+#include <string>
 
 /*
  * Options
@@ -403,11 +404,16 @@ int main(int argc, char **argv) {
       "WG size of kernel:initialize = %d, WG size of kernel:compute_step_factor = %d, WG size of kernel:compute_flux = %d, WG size of kernel:time_step = %d\n",
       BLOCK_SIZE_1, BLOCK_SIZE_2, BLOCK_SIZE_3, BLOCK_SIZE_4);
 
+  static std::string default_input_s;
+  const char *data_file_name;
   if (argc < 2) {
-    std::cout << "specify data file name" << std::endl;
-    return 0;
+    std::string src_dir(__FILE__);
+    src_dir = src_dir.substr(0, src_dir.rfind('/'));
+    default_input_s = src_dir + "/../../data/cfd/fvcorr.domn.097K";
+    data_file_name = default_input_s.c_str();
+  } else {
+    data_file_name = argv[1];
   }
-  const char *data_file_name = argv[1];
 
   cudaDeviceProp prop;
   int dev;

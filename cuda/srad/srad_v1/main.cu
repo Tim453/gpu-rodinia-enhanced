@@ -142,8 +142,10 @@ int main(int argc, char *argv[]) {
   //================================================================================80
 
   if (argc != 5) {
-    printf("ERROR: wrong number of arguments\n");
-    return 0;
+    niter = 100;
+    lambda = 0.5f;
+    Nr = 502;
+    Nc = 458;
   } else {
     niter = atoi(argv[1]);
     lambda = atof(argv[2]);

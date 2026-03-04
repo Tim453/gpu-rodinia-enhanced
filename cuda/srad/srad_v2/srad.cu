@@ -71,9 +71,15 @@ void runTest(int argc, char **argv) {
     c2 = atoi(argv[6]);     // x2 position of the speckle
     lambda = atof(argv[7]); // Lambda value
     niter = atoi(argv[8]);  // number of iterations
-
   } else {
-    usage(argc, argv);
+    rows = 2048;
+    cols = 2048;
+    r1 = 0;
+    r2 = 127;
+    c1 = 0;
+    c2 = 127;
+    lambda = 0.5f;
+    niter = 2;
   }
 
   size_I = cols * rows;

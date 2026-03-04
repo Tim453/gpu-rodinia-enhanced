@@ -29,6 +29,7 @@
 #include "devel.h"
 #include "gbar.cuh"
 #include "lonestargpu.h"
+#include <string>
 
 __global__ void dinit(unsigned *mstwt, Graph graph, ComponentSpace cs, foru *eleminwts, foru *minwtcomponent,
                       unsigned *partners, unsigned *phores, bool *processinnextiteration,
@@ -272,12 +273,18 @@ int main(int argc, char *argv[]) {
   const size_t compmintwo_res = maximum_residency(dfindcompmintwo, 384, 0);
   gb.Setup(nSM * compmintwo_res);
 
+  static std::string default_graph_s;
+  const char *graph_file;
   if (argc != 2) {
-    printf("Usage: %s <graph>\n", argv[0]);
-    exit(1);
+    std::string src_dir(__FILE__);
+    src_dir = src_dir.substr(0, src_dir.rfind('/'));
+    default_graph_s = src_dir + "/data/rmat12.sym.gr";
+    graph_file = default_graph_s.c_str();
+  } else {
+    graph_file = argv[1];
   }
 
-  hgraph.read(argv[1]);
+  hgraph.read(graph_file);
   hgraph.cudaCopy(graph);
   // graph.print();
 

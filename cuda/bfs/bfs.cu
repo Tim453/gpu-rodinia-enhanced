@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 
 #ifdef TIMING
 #include "timing.h"
@@ -68,13 +69,16 @@ void Usage(int argc, char **argv) { fprintf(stderr, "Usage: %s <input_file>\n", 
 ////////////////////////////////////////////////////////////////////////////////
 void BFSGraph(int argc, char **argv) {
 
-  char *input_f;
+  const char *input_f;
+  static std::string default_input_s;
   if (argc != 2) {
-    Usage(argc, argv);
-    exit(0);
+    std::string src_dir(__FILE__);
+    src_dir = src_dir.substr(0, src_dir.rfind('/'));
+    default_input_s = src_dir + "/../../data/bfs/graph65536.txt";
+    input_f = default_input_s.c_str();
+  } else {
+    input_f = argv[1];
   }
-
-  input_f = argv[1];
   printf("Reading File\n");
   // Read in Graph from a file
   fp = fopen(input_f, "r");

@@ -2,6 +2,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string>
 #include <sys/time.h>
 #include <time.h>
 
@@ -132,19 +133,30 @@ void usage(int argc, char **argv) {
 }
 
 int main(int argc, char **argv) {
-  if (argc != 7) {
-    usage(argc, argv);
-  }
-
   char *pfile, *tfile, *ofile;
-  int iterations = atoi(argv[3]);
-
-  pfile = argv[4];
-  tfile = argv[5];
-  ofile = argv[6];
-  int numCols = atoi(argv[1]);
-  int numRows = atoi(argv[1]);
-  int layers = atoi(argv[2]);
+  int iterations, numCols, numRows, layers;
+  static std::string default_pfile_s, default_tfile_s;
+  if (argc != 7) {
+    std::string src_dir(__FILE__);
+    src_dir = src_dir.substr(0, src_dir.rfind('/'));
+    numCols = 512;
+    numRows = 512;
+    layers = 8;
+    iterations = 100;
+    default_pfile_s = src_dir + "/../../data/hotspot3D/power_512x8";
+    default_tfile_s = src_dir + "/../../data/hotspot3D/temp_512x8";
+    pfile = const_cast<char *>(default_pfile_s.c_str());
+    tfile = const_cast<char *>(default_tfile_s.c_str());
+    ofile = const_cast<char *>("output.out");
+  } else {
+    iterations = atoi(argv[3]);
+    pfile = argv[4];
+    tfile = argv[5];
+    ofile = argv[6];
+    numCols = atoi(argv[1]);
+    numRows = atoi(argv[1]);
+    layers = atoi(argv[2]);
+  }
 
   /* calculating parameters*/
 

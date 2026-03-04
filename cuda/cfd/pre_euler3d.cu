@@ -7,6 +7,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <string>
 
 /*
  * Options
@@ -443,11 +444,16 @@ void time_step(int j, int nelr, float *old_variables, float *variables, float *s
  * Main function
  */
 int main(int argc, char **argv) {
+  static std::string default_input_s;
+  const char *data_file_name;
   if (argc < 2) {
-    std::cout << "specify data file name" << std::endl;
-    return 0;
+    std::string src_dir(__FILE__);
+    src_dir = src_dir.substr(0, src_dir.rfind('/'));
+    default_input_s = src_dir + "/../../data/cfd/fvcorr.domn.097K";
+    data_file_name = default_input_s.c_str();
+  } else {
+    data_file_name = argv[1];
   }
-  const char *data_file_name = argv[1];
 
   cudaDeviceProp prop;
   int dev;

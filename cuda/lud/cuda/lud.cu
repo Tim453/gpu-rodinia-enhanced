@@ -99,8 +99,8 @@ int main(int argc, char *argv[]) {
   }
 
   if ((optind < argc) || (optind == 1)) {
-    fprintf(stderr, "Usage: %s [-v] [-s matrix_size|-i input_file]\n", argv[0]);
-    exit(EXIT_FAILURE);
+    matrix_dim = 256;
+    do_verify = 1;
   }
 
   if (input_file) {

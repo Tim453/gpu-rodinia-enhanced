@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string>
 #include <time.h>
 
 #ifdef RD_WG_SIZE_0_0
@@ -261,15 +262,27 @@ void run(int argc, char **argv) {
   int total_iterations = 60;
   int pyramid_height = 1; // number of iterations
 
-  if (argc != 7)
-    usage(argc, argv);
-  if ((grid_rows = atoi(argv[1])) <= 0 || (grid_cols = atoi(argv[1])) <= 0 || (pyramid_height = atoi(argv[2])) <= 0 ||
-      (total_iterations = atoi(argv[3])) <= 0)
-    usage(argc, argv);
-
-  tfile = argv[4];
-  pfile = argv[5];
-  ofile = argv[6];
+  static std::string default_tfile_s, default_pfile_s;
+  if (argc != 7) {
+    std::string src_dir(__FILE__);
+    src_dir = src_dir.substr(0, src_dir.rfind('/'));
+    grid_rows = 512;
+    grid_cols = 512;
+    pyramid_height = 2;
+    total_iterations = 2;
+    default_tfile_s = src_dir + "/../../data/hotspot/temp_512";
+    default_pfile_s = src_dir + "/../../data/hotspot/power_512";
+    tfile = const_cast<char *>(default_tfile_s.c_str());
+    pfile = const_cast<char *>(default_pfile_s.c_str());
+    ofile = const_cast<char *>("output.out");
+  } else {
+    if ((grid_rows = atoi(argv[1])) <= 0 || (grid_cols = atoi(argv[1])) <= 0 ||
+        (pyramid_height = atoi(argv[2])) <= 0 || (total_iterations = atoi(argv[3])) <= 0)
+      usage(argc, argv);
+    tfile = argv[4];
+    pfile = argv[5];
+    ofile = argv[6];
+  }
 
   size = grid_rows * grid_cols;
 

@@ -11,6 +11,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 
 #include <avilib.h>
 #include <avimod.h>
@@ -126,13 +127,19 @@ int main(int argc, char *argv[]) {
   // 	FRAME
   //======================================================================================================================================================
 
+  static std::string default_video_s;
   if (argc != 3) {
-    printf("ERROR: usage: heartwall <inputfile> <num of frames>\n");
-    exit(1);
+    std::string src_dir(__FILE__);
+    src_dir = src_dir.substr(0, src_dir.rfind('/'));
+    default_video_s = src_dir + "/../../data/heartwall/test.avi";
+    video_file_name = const_cast<char *>(default_video_s.c_str());
+    frames_processed = 20;
+  } else {
+    video_file_name = argv[1];
+    frames_processed = atoi(argv[2]);
   }
 
   // open movie file
-  video_file_name = argv[1];
   frames = (avi_t *)AVI_open_input_file(video_file_name, 1); // added casting
   if (frames == NULL) {
     AVI_print_error((char *)"Error with AVI_open_input_file");
@@ -153,7 +160,6 @@ int main(int argc, char *argv[]) {
   // 	CHECK INPUT ARGUMENTS
   //======================================================================================================================================================
 
-  frames_processed = atoi(argv[2]);
   if (frames_processed < 0 || frames_processed > common.no_frames) {
     printf("ERROR: %d is an incorrect number of frames specified, select in the range of 0-%d\n", frames_processed,
            common.no_frames);

@@ -38,8 +38,9 @@ void init(int argc, char **argv) {
     rows = atoi(argv[2]);
     pyramid_height = atoi(argv[3]);
   } else {
-    printf("Usage: dynproc row_len col_len pyramid_height\n");
-    exit(0);
+    cols = 100000;
+    rows = 100;
+    pyramid_height = 20;
   }
   data = new int[rows * cols];
   wall = new int *[rows];

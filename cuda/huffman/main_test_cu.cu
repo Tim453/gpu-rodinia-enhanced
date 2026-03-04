@@ -18,6 +18,7 @@
 #include "stats_logger.h"
 #include "stdafx.h"
 #include <cuda_runtime.h>
+#include <string>
 #include <sys/time.h>
 // #include "vlc_kernel_gm32.cu"
 // #include "vlc_kernel_sm32.cu"
@@ -44,11 +45,14 @@ int main(int argc, char *argv[]) {
     return 0;
   }
   unsigned int num_block_threads = 256;
-  if (argc > 1)
+  if (argc > 1) {
     for (int i = 1; i < argc; i++)
       runVLCTest(argv[i], num_block_threads);
-  else {
-    runVLCTest(NULL, num_block_threads, 1024);
+  } else {
+    std::string src_dir(__FILE__);
+    src_dir = src_dir.substr(0, src_dir.rfind('/'));
+    static std::string default_input_s = src_dir + "/../../data/huffman/test1024_H2.206587175259.in";
+    runVLCTest(const_cast<char *>(default_input_s.c_str()), num_block_threads);
   }
   CUDA_SAFE_CALL(cudaThreadExit());
   return 0;

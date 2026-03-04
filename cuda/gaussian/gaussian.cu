@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 #include <sys/time.h>
 
 #ifdef TIMING
@@ -104,29 +105,10 @@ int main(int argc, char *argv[]) {
   int i, j;
   char flag;
   if (argc < 2) {
-    printf("Usage: gaussian -f filename / -s size [-q]\n\n");
-    printf("-q (quiet) suppresses printing the matrix and result values.\n");
-    printf("-f (filename) path of input file\n");
-    printf("-s (size) size of matrix. Create matrix and rhs in this program \n");
-    printf("The first line of the file contains the dimension of the matrix, n.");
-    printf("The second line of the file is a newline.\n");
-    printf("The next n lines contain n tab separated values for the matrix.");
-    printf("The next line of the file is a newline.\n");
-    printf("The next line of the file is a 1xn vector with tab separated values.\n");
-    printf("The next line of the file is a newline. (optional)\n");
-    printf("The final line of the file is the pre-computed solution. (optional)\n");
-    printf("Example: matrix4.txt:\n");
-    printf("4\n");
-    printf("\n");
-    printf("-0.6	-0.5	0.7	0.3\n");
-    printf("-0.3	-0.9	0.3	0.7\n");
-    printf("-0.4	-0.5	-0.3	-0.8\n");
-    printf("0.0	-0.1	0.2	0.9\n");
-    printf("\n");
-    printf("-0.85	-0.68	0.24	-0.53\n");
-    printf("\n");
-    printf("0.7	0.0	-0.4	-0.5\n");
-    exit(0);
+    std::string src_dir(__FILE__);
+    src_dir = src_dir.substr(0, src_dir.rfind('/'));
+    std::string default_input = src_dir + "/../../data/gaussian/matrix4.txt";
+    InitProblemOnce(const_cast<char *>(default_input.c_str()));
   }
 
   PrintDeviceProperties();

@@ -136,16 +136,10 @@ int main(int argc, char *argv[]) {
   //============================================================60
 
   if (argc != 4) {
-    printf("ERROR: %d is the incorrect number of arguments, the number of arguments must be 3\n", argc - 1);
-    return 0;
-  }
-
-  //============================================================60
-  //		GET AND CHECK PARTICULAR ARGUMENTS
-  //============================================================60
-
-  else {
-
+    xmax = 100;
+    workload = 1;
+    mode = 0;
+  } else {
     //========================================40
     //		SPAN
     //========================================40

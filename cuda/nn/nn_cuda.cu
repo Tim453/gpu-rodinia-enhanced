@@ -8,6 +8,7 @@
 #include <float.h>
 #include <stdio.h>
 #include <sys/time.h>
+#include <string>
 #include <vector>
 
 #ifdef TIMING
@@ -77,13 +78,19 @@ int main(int argc, char *argv[]) {
 
   std::vector<Record> records;
   std::vector<LatLong> locations;
-  char filename[100];
-  int resultsCount = 10;
+  char filename[4096];
+  int resultsCount = 5;
+  lat = 30.0f;
+  lng = 90.0f;
 
   // parse command line
   if (parseCommandline(argc, argv, filename, &resultsCount, &lat, &lng, &quiet, &timing, &platform, &device)) {
-    printUsage();
-    return 0;
+    // no arguments: use default filelist relative to source directory
+    std::string src_dir(__FILE__);
+    src_dir = src_dir.substr(0, src_dir.rfind('/'));
+    std::string default_filelist = src_dir + "/filelist_4";
+    strncpy(filename, default_filelist.c_str(), sizeof(filename) - 1);
+    filename[sizeof(filename) - 1] = '\0';
   }
 
   int numRecords = loadData(filename, records, locations);
@@ -191,6 +198,11 @@ int loadData(char *filename, std::vector<Record> &records, std::vector<LatLong> 
   char dbname[64];
   int recNum = 0;
 
+  // Get directory of the filelist to resolve relative paths inside it
+  std::string filelist_dir(filename);
+  size_t last_slash = filelist_dir.rfind('/');
+  filelist_dir = (last_slash != std::string::npos) ? filelist_dir.substr(0, last_slash) : ".";
+
   /**Main processing **/
 
   flist = fopen(filename, "r");
@@ -204,7 +216,14 @@ int loadData(char *filename, std::vector<Record> &records, std::vector<LatLong> 
       fprintf(stderr, "error reading filelist\n");
       exit(0);
     }
-    fp = fopen(dbname, "r");
+    // Resolve relative paths relative to the filelist's directory
+    std::string resolved_dbname;
+    if (dbname[0] != '/') {
+      resolved_dbname = filelist_dir + "/" + dbname;
+    } else {
+      resolved_dbname = dbname;
+    }
+    fp = fopen(resolved_dbname.c_str(), "r");
     if (!fp) {
       printf("error opening a db\n");
       exit(1);
@@ -275,7 +294,7 @@ int parseCommandline(int argc, char *argv[], char *filename, int *r, float *lat,
   int i;
   if (argc < 2)
     return 1; // error
-  strncpy(filename, argv[1], 100);
+  strncpy(filename, argv[1], 4096);
   char flag;
 
   for (i = 1; i < argc; i++) {

@@ -162,8 +162,16 @@ int setup(int argc, char **argv) {
     }
   }
 
-  if (filename == 0)
-    usage(argv[0]);
+  static char default_filename[4096];
+  if (filename == 0) {
+    char src_dir[4096];
+    snprintf(src_dir, sizeof(src_dir), "%s", __FILE__);
+    char *last_slash = strrchr(src_dir, '/');
+    if (last_slash) *last_slash = '\0';
+    snprintf(default_filename, sizeof(default_filename), "%s/../../data/kmeans/kdd_cup", src_dir);
+    filename = default_filename;
+    isOutput = 1;
+  }
 
   /* ============== I/O begin ==============*/
   /* get nfeatures and npoints */

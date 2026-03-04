@@ -91,10 +91,12 @@ void runTest(int argc, char **argv) {
     max_cols = atoi(argv[1]);
     penalty = atoi(argv[2]);
   } else {
-    usage(argc, argv);
+    max_rows = 2048;
+    max_cols = 2048;
+    penalty = 10;
   }
 
-  if (atoi(argv[1]) % 16 != 0) {
+  if (max_rows % 16 != 0) {
     fprintf(stderr, "The dimension values must be a multiple of 16\n");
     exit(1);
   }

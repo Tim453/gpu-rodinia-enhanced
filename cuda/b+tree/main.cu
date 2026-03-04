@@ -63,6 +63,7 @@
 // needed by ???
 #include <math.h>   // (in directory known to compiler)			needed by log, pow
 #include <string.h> // (in directory known to compiler)			needed by memset
+#include <string>
 #include <sys/time.h>
 //======================================================================================================================================================150
 //	COMMON
@@ -1649,9 +1650,20 @@ int main(int argc, char **argv) {
       }
     }
   }
-  // Print configuration
-  if ((input_file == NULL) || (command_file == NULL))
-    printf("Usage: ./b+tree file input_file command command_list\n");
+  // Set default data file paths if not provided
+  static std::string default_input_s, default_command_s;
+  if (input_file == NULL || command_file == NULL) {
+    std::string src_dir(__FILE__);
+    src_dir = src_dir.substr(0, src_dir.rfind('/'));
+    if (input_file == NULL) {
+      default_input_s = src_dir + "/../../data/b+tree/mil.txt";
+      input_file = const_cast<char *>(default_input_s.c_str());
+    }
+    if (command_file == NULL) {
+      default_command_s = src_dir + "/../../data/b+tree/command.txt";
+      command_file = const_cast<char *>(default_command_s.c_str());
+    }
+  }
 
   // For debug
   printf("Input File: %s \n", input_file);

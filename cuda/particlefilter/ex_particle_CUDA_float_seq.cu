@@ -806,62 +806,44 @@ void particleFilter(unsigned char *I, int IszX, int IszY, int Nfr, int *seed, in
 
 int main(int argc, char *argv[]) {
 
-  char *usage = "double.out -x <dimX> -y <dimY> -z <Nfr> -np <Nparticles>";
-  // check number of arguments
-  if (argc != 9) {
-    printf("%s\n", usage);
-    return 0;
-  }
-  // check args deliminators
-  if (strcmp(argv[1], "-x") || strcmp(argv[3], "-y") || strcmp(argv[5], "-z") || strcmp(argv[7], "-np")) {
-    printf("%s\n", usage);
-    return 0;
-  }
-
   int IszX, IszY, Nfr, Nparticles;
 
-  // converting a string to a integer
-  if (sscanf(argv[2], "%d", &IszX) == EOF) {
-    printf("ERROR: dimX input is incorrect");
-    return 0;
-  }
+  if (argc != 9) {
+    IszX = 128;
+    IszY = 128;
+    Nfr = 10;
+    Nparticles = 1000;
+  } else {
+    char *usage = "double.out -x <dimX> -y <dimY> -z <Nfr> -np <Nparticles>";
+    // check args deliminators
+    if (strcmp(argv[1], "-x") || strcmp(argv[3], "-y") || strcmp(argv[5], "-z") || strcmp(argv[7], "-np")) {
+      printf("%s\n", usage);
+      return 0;
+    }
 
-  if (IszX <= 0) {
-    printf("dimX must be > 0\n");
-    return 0;
-  }
+    // converting a string to a integer
+    if (sscanf(argv[2], "%d", &IszX) == EOF || IszX <= 0) {
+      printf("ERROR: dimX input is incorrect\n");
+      return 0;
+    }
 
-  // converting a string to a integer
-  if (sscanf(argv[4], "%d", &IszY) == EOF) {
-    printf("ERROR: dimY input is incorrect");
-    return 0;
-  }
+    // converting a string to a integer
+    if (sscanf(argv[4], "%d", &IszY) == EOF || IszY <= 0) {
+      printf("ERROR: dimY input is incorrect\n");
+      return 0;
+    }
 
-  if (IszY <= 0) {
-    printf("dimY must be > 0\n");
-    return 0;
-  }
+    // converting a string to a integer
+    if (sscanf(argv[6], "%d", &Nfr) == EOF || Nfr <= 0) {
+      printf("ERROR: Number of frames input is incorrect\n");
+      return 0;
+    }
 
-  // converting a string to a integer
-  if (sscanf(argv[6], "%d", &Nfr) == EOF) {
-    printf("ERROR: Number of frames input is incorrect");
-    return 0;
-  }
-
-  if (Nfr <= 0) {
-    printf("number of frames must be > 0\n");
-    return 0;
-  }
-
-  // converting a string to a integer
-  if (sscanf(argv[8], "%d", &Nparticles) == EOF) {
-    printf("ERROR: Number of particles input is incorrect");
-    return 0;
-  }
-
-  if (Nparticles <= 0) {
-    printf("Number of particles must be > 0\n");
-    return 0;
+    // converting a string to a integer
+    if (sscanf(argv[8], "%d", &Nparticles) == EOF || Nparticles <= 0) {
+      printf("ERROR: Number of particles input is incorrect\n");
+      return 0;
+    }
   }
   // establish seed
   int *seed = (int *)malloc(sizeof(int) * Nparticles);

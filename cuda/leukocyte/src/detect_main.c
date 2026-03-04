@@ -1,5 +1,7 @@
 #include "find_ellipse.h"
 #include "track_ellipse.h"
+#include <stdio.h>
+#include <string.h>
 
 int main(int argc, char **argv) {
 
@@ -9,16 +11,21 @@ int main(int argc, char **argv) {
   // Keep track of the start time of the program
   long long program_start_time = get_time();
 
+  int num_frames;
+  char *video_file_name;
+  static char default_video[4096];
   if (argc != 3) {
-    fprintf(stderr, "usage: %s <input file> <number of frames to process>", argv[0]);
-    exit(1);
+    char src_dir[4096];
+    snprintf(src_dir, sizeof(src_dir), "%s", __FILE__);
+    char *last_slash = strrchr(src_dir, '/');
+    if (last_slash) *last_slash = '\0';
+    snprintf(default_video, sizeof(default_video), "%s/../../../data/leukocyte/testfile.avi", src_dir);
+    video_file_name = default_video;
+    num_frames = 5;
+  } else {
+    num_frames = atoi(argv[2]);
+    video_file_name = argv[1];
   }
-
-  // Let the user specify the number of frames to process
-  int num_frames = atoi(argv[2]);
-
-  // Open video file
-  char *video_file_name = argv[1];
 
   avi_t *cell_file = AVI_open_input_file(video_file_name, 1);
   if (cell_file == NULL) {

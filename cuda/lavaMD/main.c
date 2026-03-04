@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
   //======================================================================================================================================================150
 
   // assing default values
-  dim_cpu.boxes1d_arg = 1;
+  dim_cpu.boxes1d_arg = 10;
 
   // go through arguments
   for (dim_cpu.cur_arg = 1; dim_cpu.cur_arg < argc; dim_cpu.cur_arg++) {
