@@ -65,10 +65,6 @@ int runHisto(char *file, unsigned int *freq, unsigned int memSize, unsigned int 
   cudaDeviceProp prop;
   (cudaGetDeviceProperties(&prop, 0));
   int blocks = prop.multiProcessorCount;
-  if (!prop.deviceOverlap) {
-    cout << "No overlaps, so no speedup from streams" << endl;
-    return 0;
-  }
 
   // allocate memory on the GPU for the file's data
   int partSize = memSize / 32;

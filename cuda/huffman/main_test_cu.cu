@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
     static std::string default_input_s = src_dir + "/../../data/huffman/test1024_H2.206587175259.in";
     runVLCTest(const_cast<char *>(default_input_s.c_str()), num_block_threads);
   }
-  CUDA_SAFE_CALL(cudaThreadExit());
+
   return 0;
 }
 

@@ -216,9 +216,7 @@ void PrintDeviceProperties() {
              deviceProp.maxGridSize[2]);
       printf("\nTotal constant memory \t\t\t - %zu bytes", deviceProp.totalConstMem);
       printf("\nCUDA ver \t\t\t\t - %d.%d", deviceProp.major, deviceProp.minor);
-      printf("\nClock rate \t\t\t\t - %d KHz", deviceProp.clockRate);
       printf("\nTexture Alignment \t\t\t - %zu bytes", deviceProp.textureAlignment);
-      printf("\nDevice Overlap \t\t\t\t - %s", deviceProp.deviceOverlap ? "Allowed" : "Not Allowed");
       printf("\nNumber of Multi processors \t\t - %d\n\n", deviceProp.multiProcessorCount);
     } else
       printf("\n%s", cudaGetErrorString(cudaGetLastError()));
