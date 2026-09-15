@@ -21,7 +21,7 @@ This is an enhanced version of the Rodinia Benchmark Suite that has been updated
 3. **Selecting Build Targets**
    - CUDA benchmarks: Built by default
    - OpenMP benchmarks: Built by default
-   - OpenCL benchmarks: Currently a work in progress (TODO)
+   - OpenCL benchmarks: Built by default
 
 4. **Running Benchmarks**
    After building, executable binaries will be available in the `build/bin/` directory.
