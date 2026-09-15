@@ -259,7 +259,10 @@ string FileToString(const string fileName){
 	@return:
 	@date:		24/03/2011
 ------------------------------------------------------------*/
-char device_type[3];
+/* Was char[3], which cannot hold "gpu\0"/"cpu\0"/"acc\0": sscanf wrote one
+   byte past the end and left the array unterminated, so the std::string
+   built from it in _clInit ran off into whatever followed. */
+char device_type[16] = "";
 int device_id = 0;
 int platform_id = 0;
 void _clCmdParams(int argc, char* argv[]){
@@ -267,7 +270,7 @@ void _clCmdParams(int argc, char* argv[]){
 		switch (argv[i][1]){
 			case 't':	//--t stands for device type
 				if (++i < argc){
-					sscanf(argv[i], "%s", device_type);
+					sscanf(argv[i], "%15s", device_type);
 				}
 				else{
 					std::cerr << "Could not read argument after option " << argv[i-1] << std::endl;

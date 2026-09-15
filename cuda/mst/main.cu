@@ -25,10 +25,16 @@
  * @author Sreepathi Pai <sreepai@ices.utexas.edu>
  */
 
-#include "cuda_launch_config.hpp"
-#include "devel.h"
-#include "gbar.cuh"
+// Include order matters and the blank lines keep clang-format from collapsing it:
+// lonestargpu.h defines Graph/ComponentSpace/foru, gbar.cuh defines
+// GlobalBarrier, and devel.h uses all of them.
 #include "lonestargpu.h"
+
+#include "cuda_launch_config.hpp"
+#include "gbar.cuh"
+
+#include "devel.h"
+
 #include <string>
 
 __global__ void dinit(unsigned *mstwt, Graph graph, ComponentSpace cs, foru *eleminwts, foru *minwtcomponent,
@@ -385,7 +391,7 @@ int main(int argc, char *argv[]) {
   endtime = rtclock();
 
   printf("\tmstwt = %u, iterations = %d.\n", hmstwt, iteration);
-  printf("\t%s result: weight: %u, components: %u, edges: %u\n", argv[1], hmstwt, currncomponents, edgecount);
+  printf("\t%s result: weight: %u, components: %u, edges: %u\n", graph_file, hmstwt, currncomponents, edgecount);
   printf("\truntime [mst] = %f ms.\n", 1000 * (endtime - starttime));
 
   // cleanup left to the OS.

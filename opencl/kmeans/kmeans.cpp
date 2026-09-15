@@ -248,6 +248,8 @@ int allocate(int n_points, int n_features, int n_clusters, float **feature)
     clReleaseEvent(event);
 
 	membership_OCL = (int*) malloc(n_points * sizeof(int));
+
+	return 0;
 }
 
 void deallocateMemory()

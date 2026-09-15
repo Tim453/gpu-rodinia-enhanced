@@ -4,6 +4,10 @@
 #include <sys/time.h>
 #include <CL/cl.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void time_measure_start(struct timeval *tv);
 void time_measure_end(struct timeval *tv);
 
@@ -21,5 +25,9 @@ static inline void tvsub(struct timeval *x,
 }
 
 float probe_event_time(cl_event, cl_command_queue);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

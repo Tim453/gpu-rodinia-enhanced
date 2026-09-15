@@ -38,7 +38,7 @@
 /******************************************************************************/
 
 /*************************************************************************/
-/**   File:         kmeans_clustering.c                                 **/
+/**   File:         kmeans_clustering.cpp                               **/
 /**   Description:  Implementation of regular k-means clustering        **/
 /**                 algorithm                                           **/
 /**   Author:  Wei-keng Liao                                            **/

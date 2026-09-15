@@ -1,5 +1,3 @@
-
-
 add_library(omp_meschach_lib STATIC
     arnoldi.c
     bdfactor.c
@@ -7,20 +5,16 @@ add_library(omp_meschach_lib STATIC
     chfactor.c
     conjgrad.c
     copy.c
-    dmacheps.c
     err.c
     extras.c
     fft.c
-    fmacheps.c
     givens.c
     hessen.c
     hsehldr.c
     init.c
-    iotort.c
     iter0.c
     iternsym.c
     itersym.c
-    itertort.c
     ivecop.c
     lanczos.c
     lufactor.c
@@ -28,13 +22,10 @@ add_library(omp_meschach_lib STATIC
     matlab.c
     matop.c
     matrixio.c
-    maxint.c
     meminfo.c
     memory.c
     memstat.c
-    memtort.c
     mfunc.c
-    mfuntort.c
     norm.c
     otherio.c
     pxop.c
@@ -48,13 +39,9 @@ add_library(omp_meschach_lib STATIC
     splufctr.c
     sprow.c
     spswap.c
-    sptort.c
     submat.c
     svd.c
     symmeig.c
-    torture.c
-    tutadv.c
-    tutorial.c
     update.c
     vecop.c
     version.c
@@ -73,6 +60,7 @@ add_library(omp_meschach_lib STATIC
     zqrfctr.c
     zschur.c
     zsolve.c
-    ztorture.c
     zvecop.c
 )
+
+target_include_directories(omp_meschach_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

@@ -1,5 +1,5 @@
 /*************************************************************************/
-/**   File:         rmse.c												**/
+/**   File:         rmse.cpp												**/
 /**   Description:  calculate root mean squared error of particular     **/
 /**                 clustering.											**/
 /**   Author:  Sang-Ha Lee												**/

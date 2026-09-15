@@ -38,7 +38,7 @@
 /******************************************************************************/
 
 /*************************************************************************/
-/**   File:         cluster.c                                           **/
+/**   File:         cluster.cpp                                         **/
 /**   Description:  Takes as input a file, containing 1 data point per  **/
 /**                 per line, and performs a fuzzy c-means clustering   **/
 /**                 on the data. Fuzzy clustering is performed using    **/

@@ -19,8 +19,8 @@ CC_FLAGS = -g -O3 -Wall
 
 EXE = nw.out
 
-$(EXE): nw.c
-	$(CC) ${KERNEL_DIM} $(CC_FLAGS) -o $(EXE) nw.c ../util/timing.c \
+$(EXE): nw.cpp
+	$(CC) ${KERNEL_DIM} $(CC_FLAGS) -o $(EXE) nw.cpp ../util/timing.c \
 		-I$(OPENCL_INC) -L$(OPENCL_LIB) -lOpenCL \
 		-I../util -DTIMING \
 		-Wno-unused-result

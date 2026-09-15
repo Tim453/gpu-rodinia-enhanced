@@ -44,7 +44,7 @@
 #define FLT_MAX 3.40282347e+38
 #endif
 
-/* rmse.c */
+/* rmse.cpp */
 float   euclid_dist_2        (float*, float*, int);
 int     find_nearest_point   (float* , int, float**, int);
 float	rms_err(float**, int, int, float**, int);

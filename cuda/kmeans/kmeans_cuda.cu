@@ -111,14 +111,33 @@ extern "C" void deallocateMemory() {
 // //
 
 int main(int argc, char **argv) {
-  // make sure we're running on the big card
-  cudaSetDevice(1);
-  // as done in the CUDA start/help document provided
   setup(argc, argv);
 }
 
 //																			  //
 ////////////////////////////////////////////////////////////////////////////////
+
+/* Wraps a linear device allocation in a texture object; replaces the
+   cudaBindTexture() calls that the removed texture reference API provided. */
+static cudaTextureObject_t createFeatureTexture(float *devPtr, size_t bytes) {
+  cudaResourceDesc resDesc;
+  memset(&resDesc, 0, sizeof(resDesc));
+  resDesc.resType = cudaResourceTypeLinear;
+  resDesc.res.linear.devPtr = devPtr;
+  resDesc.res.linear.desc = cudaCreateChannelDesc<float>();
+  resDesc.res.linear.sizeInBytes = bytes;
+
+  cudaTextureDesc texDesc;
+  memset(&texDesc, 0, sizeof(texDesc));
+  texDesc.filterMode = cudaFilterModePoint;
+  texDesc.readMode = cudaReadModeElementType;
+  texDesc.normalizedCoords = 0;
+
+  cudaTextureObject_t tex = 0;
+  if (cudaCreateTextureObject(&tex, &resDesc, &texDesc, NULL) != cudaSuccess)
+    printf("Couldn't bind features array to texture!\n");
+  return tex;
+}
 
 /* ------------------- kmeansCuda() ------------------------ */
 extern "C" int                   // delta -- had problems when return value was of float type
@@ -134,42 +153,18 @@ kmeansCuda(float **feature,      /* in: [npoints][nfeatures] */
   int delta = 0; /* if point has moved */
   int i, j;      /* counters */
 
-  cudaSetDevice(1);
-
   /* copy membership (host to device) */
   cudaMemcpy(membership_d, membership_new, npoints * sizeof(int), cudaMemcpyHostToDevice);
 
   /* copy clusters (host to device) */
   cudaMemcpy(clusters_d, clusters[0], nclusters * nfeatures * sizeof(float), cudaMemcpyHostToDevice);
 
-  /* set up texture */
-  cudaChannelFormatDesc chDesc0 = cudaCreateChannelDesc<float>();
-  t_features.filterMode = cudaFilterModePoint;
-  t_features.normalized = false;
-  t_features.channelDesc = chDesc0;
-
-  if (cudaBindTexture(NULL, &t_features, feature_d, &chDesc0, npoints * nfeatures * sizeof(float)) != CUDA_SUCCESS)
-    printf("Couldn't bind features array to texture!\n");
-
-  cudaChannelFormatDesc chDesc1 = cudaCreateChannelDesc<float>();
-  t_features_flipped.filterMode = cudaFilterModePoint;
-  t_features_flipped.normalized = false;
-  t_features_flipped.channelDesc = chDesc1;
-
-  if (cudaBindTexture(NULL, &t_features_flipped, feature_flipped_d, &chDesc1, npoints * nfeatures * sizeof(float)) !=
-      CUDA_SUCCESS)
-    printf("Couldn't bind features_flipped array to texture!\n");
-
-  cudaChannelFormatDesc chDesc2 = cudaCreateChannelDesc<float>();
-  t_clusters.filterMode = cudaFilterModePoint;
-  t_clusters.normalized = false;
-  t_clusters.channelDesc = chDesc2;
-
-  if (cudaBindTexture(NULL, &t_clusters, clusters_d, &chDesc2, nclusters * nfeatures * sizeof(float)) != CUDA_SUCCESS)
-    printf("Couldn't bind clusters array to texture!\n");
+  /* set up texture objects over the two feature arrays */
+  cudaTextureObject_t t_features = createFeatureTexture(feature_d, npoints * nfeatures * sizeof(float));
+  cudaTextureObject_t t_features_flipped = createFeatureTexture(feature_flipped_d, npoints * nfeatures * sizeof(float));
 
   /* copy clusters to constant memory */
-  cudaMemcpyToSymbol("c_clusters", clusters[0], nclusters * nfeatures * sizeof(float), 0, cudaMemcpyHostToDevice);
+  cudaMemcpyToSymbol(c_clusters, clusters[0], nclusters * nfeatures * sizeof(float), 0, cudaMemcpyHostToDevice);
 
   /* setup execution parameters.
          changed to 2d (source code on NVIDIA CUDA Programming Guide) */
@@ -178,9 +173,12 @@ kmeansCuda(float **feature,      /* in: [npoints][nfeatures] */
 
   /* execute the kernel */
   kmeansPoint<<<grid, threads>>>(feature_d, nfeatures, npoints, nclusters, membership_d, clusters_d, block_clusters_d,
-                                 block_deltas_d);
+                                 block_deltas_d, t_features, t_features_flipped);
 
   cudaDeviceSynchronize();
+
+  cudaDestroyTextureObject(t_features);
+  cudaDestroyTextureObject(t_features_flipped);
 
   /* copy back membership (device to host) */
   cudaMemcpy(membership_new, membership_d, npoints * sizeof(int), cudaMemcpyDeviceToHost);

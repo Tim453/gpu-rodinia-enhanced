@@ -9,9 +9,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 #include "bucketsort.cuh"
 #include "helper_cuda.h"
-#include <GL/glew.h>
-#include <GL/glut.h>
-#include <cuda_gl_interop.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -98,13 +95,27 @@ void bucketSort(float *d_input, float *d_output, int listsize, int *sizes, int *
   ///////////////////////////////////////////////////////////////////////////
   checkCudaErrors(cudaMemcpy(l_pivotpoints, pivotPoints, (DIVISIONS) * sizeof(int), cudaMemcpyHostToDevice));
   checkCudaErrors(cudaMemset((void *)d_offsets, 0, DIVISIONS * sizeof(int)));
-  checkCudaErrors(cudaBindTexture(0, texPivot, l_pivotpoints, DIVISIONS * sizeof(int)));
+  cudaResourceDesc pivotRes;
+  memset(&pivotRes, 0, sizeof(pivotRes));
+  pivotRes.resType = cudaResourceTypeLinear;
+  pivotRes.res.linear.devPtr = l_pivotpoints;
+  pivotRes.res.linear.desc = cudaCreateChannelDesc<float>();
+  pivotRes.res.linear.sizeInBytes = DIVISIONS * sizeof(float);
+
+  cudaTextureDesc pivotTexDesc;
+  memset(&pivotTexDesc, 0, sizeof(pivotTexDesc));
+  pivotTexDesc.filterMode = cudaFilterModePoint;
+  pivotTexDesc.readMode = cudaReadModeElementType;
+  pivotTexDesc.normalizedCoords = 0;
+
+  cudaTextureObject_t texPivot = 0;
+  checkCudaErrors(cudaCreateTextureObject(&texPivot, &pivotRes, &pivotTexDesc, NULL));
   // Setup block and grid
   dim3 threads(BUCKET_THREAD_N, 1);
   int blocks = ((listsize - 1) / (threads.x * BUCKET_BAND)) + 1;
   dim3 grid(blocks, 1);
   // Find the new indice for all elements
-  bucketcount<<<grid, threads>>>(d_input, d_indice, d_prefixoffsets, listsize);
+  bucketcount<<<grid, threads>>>(d_input, d_indice, d_prefixoffsets, listsize, texPivot);
   ///////////////////////////////////////////////////////////////////////////
   // Prefix scan offsets and align each division to float4 (required by
   // mergesort)
@@ -148,6 +159,8 @@ void bucketSort(float *d_input, float *d_output, int listsize, int *sizes, int *
   blocks = ((listsize - 1) / (threads.x * BUCKET_BAND)) + 1;
   grid.x = blocks;
   bucketsort<<<grid, threads>>>(d_input, d_indice, d_output, listsize, d_prefixoffsets, l_offsets);
+
+  checkCudaErrors(cudaDestroyTextureObject(texPivot));
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -22,20 +22,20 @@ kmeans: cluster.o getopt.o read_input.o kmeans_clustering.o rmse.o
         -I$(OPENCL_INC) -L$(OPENCL_LIB) -lOpenCL \
         -I../util -DTIMING
 
-%.o: %.[ch]
+%.o: %.cpp
 	$(CC) $(CC_FLAGS) $< -c
 
-cluster.o: cluster.c 
-	$(CC) $(CC_FLAGS) cluster.c -c
+cluster.o: cluster.cpp 
+	$(CC) $(CC_FLAGS) cluster.cpp -c
 
-getopt.o: getopt.c 
-	$(CC) $(CC_FLAGS) getopt.c -c
+getopt.o: getopt.cpp 
+	$(CC) $(CC_FLAGS) getopt.cpp -c
 
-kmeans.o: kmeans.c 
-	$(CC) $(CC_FLAGS) read_input.c -c
+read_input.o: read_input.cpp
+	$(CC) $(CC_FLAGS) read_input.cpp -c
 
-rmse.o: rmse.c
-	$(CC) $(CC_FLAGS) rmse.c -c
+rmse.o: rmse.cpp
+	$(CC) $(CC_FLAGS) rmse.cpp -c
 
 clean:
 	rm -f *.o *~ kmeans.out *.linkinfo

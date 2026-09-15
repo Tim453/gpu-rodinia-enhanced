@@ -32,7 +32,7 @@
 #define GETQCHAR(qrypos)                                                                                               \
   ((queries[((qrypos) >> 2) << 4]) & ((0xFF) << (((qrypos) & 0x00000003)) << 3)) >> ((((qrypos) & 0x00000003)) << 3)
 #elif QRYTEX
-#define GETQCHAR(qrypos) tex1Dfetch(qrytex, qryAddr + qrypos)
+#define GETQCHAR(qrypos) tex1Dfetch<char>(qrytex, qryAddr + qrypos)
 #else
 #define GETQCHAR(qrypos) queries[qrypos]
 #endif
@@ -127,21 +127,16 @@
 #define SHIFT_QUERIES(queries, qryAddr) queries += qryAddr
 #endif
 
-#if REORDER_TREE
-texture<uint4, 2, cudaReadModeElementType> nodetex;
-texture<uint4, 2, cudaReadModeElementType> childrentex;
-#else
-texture<uint4, 1, cudaReadModeElementType> nodetex;
-texture<uint4, 1, cudaReadModeElementType> childrentex;
-#endif
-
-#if REORDER_REF
-texture<char, 2, cudaReadModeElementType> reftex;
-#else
-texture<char, 1, cudaReadModeElementType> reftex;
-#endif
-
-texture<char, 1, cudaReadModeElementType> qrytex;
+// Texture references were removed from the CUDA runtime. The equivalent texture
+// objects are created on the host (see BIND_TEX/BIND_TEX_ARRAY in mummergpu.cu)
+// and pushed into these device symbols, which keeps the accessors below --- and
+// the #if maze that selects between them --- unchanged. A texture object does
+// not encode its dimensionality in its type, so one declaration covers both the
+// 1D and the 2D (REORDER_*) layouts.
+__device__ cudaTextureObject_t nodetex;
+__device__ cudaTextureObject_t childrentex;
+__device__ cudaTextureObject_t reftex;
+__device__ cudaTextureObject_t qrytex;
 
 struct __align__(8) _MatchCoord {
   union {
@@ -298,13 +293,13 @@ __device__ char getRef(int refpos
   int x = bigx >> 2;
 
 #if REFTEX
-  return tex2D(reftex, x, y);
+  return tex2D<char>(reftex, x, y);
 #else
   return *(ref + 65536 * y + x);
 #endif
 #else
 #if REFTEX
-  return tex1Dfetch(reftex, refpos);
+  return tex1Dfetch<char>(reftex, refpos);
 #else
   return ref[refpos];
 #endif
@@ -362,9 +357,9 @@ __device__ uint4 getNode(unsigned int cur, bool use_two_level
 
 #if NODETEX
 #if REORDER_TREE
-  return tex2D(nodetex, cur & 0x0000FFFF, (cur & 0xFFFF0000) >> 16);
+  return tex2D<uint4>(nodetex, cur & 0x0000FFFF, (cur & 0xFFFF0000) >> 16);
 #else
-  return tex1Dfetch(nodetex, cur);
+  return tex1Dfetch<uint4>(nodetex, cur);
 #endif
 
 #else
@@ -407,9 +402,9 @@ __device__ uint4 getChildren(unsigned int cur, bool use_two_level
 
 #if CHILDTEX
 #if REORDER_TREE
-  return tex2D(childrentex, cur & 0x0000FFFF, (cur & 0xFFFF0000) >> 16);
+  return tex2D<uint4>(childrentex, cur & 0x0000FFFF, (cur & 0xFFFF0000) >> 16);
 #else
-  return tex1Dfetch(childrentex, cur);
+  return tex1Dfetch<uint4>(childrentex, cur);
 #endif
 #else
 #if REORDER_TREE
@@ -892,7 +887,7 @@ __global__ void mummergpuRCKernel(MatchCoord *match_coords, char *queries, const
                    XPRINTF("Next edge to follow: %c (%d)\n", c, qry_match_len);
 
                _PixelOfChildren children;
-                   children.data = tex2D(childrentex,cur.x, cur.y);
+                   children.data = tex2D<uint4>(childrentex,cur.x, cur.y);
                    prev = cur;
 
                    switch(c)
@@ -922,7 +917,7 @@ __global__ void mummergpuRCKernel(MatchCoord *match_coords, char *queries, const
                    }
 
            {
-                     node.data = tex2D(nodetex, cur.data & 0xFFFF, cur.data >> 16);
+                     node.data = tex2D<uint4>(nodetex, cur.data & 0xFFFF, cur.data >> 16);
            }
 
                    XPRINTF(" Edge coordinates: %d - %d\n", MKI(node.start), MKI(node.end));
@@ -994,7 +989,7 @@ __global__ void mummergpuRCKernel(MatchCoord *match_coords, char *queries, const
 
         NEXT_SUBSTRING:
 
-        node.data = tex2D(nodetex, prev.x, prev.y);
+        node.data = tex2D<uint4>(nodetex, prev.x, prev.y);
         cur = node.suffix;
 
         XPRINTF(" following suffix link. mustmatch:%d qry_match_len:%d sl:(%d,%d)\n",

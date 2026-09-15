@@ -15,6 +15,7 @@
 #include <stdint.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 #define ulong4 uint32_t
 #define uint4 uint32_t
@@ -157,12 +158,11 @@ public:
     }
   }
 
-  int id() {
-    if (this) {
-      return m_nodeid;
-    }
-    return 0;
-  }
+  // This used to be a non-static member that tested `if (this)`. Since C++11
+  // `this` is never null, so compilers delete that test and the callers below
+  // that pass a NULL node (the root's parent, a missing suffix link) crash.
+  // Taking the node as an argument restores the intended "NULL node has id 0".
+  static int id(SuffixNode *node) { return node ? node->m_nodeid : 0; }
 
   void setPrintParent(int min_match_len) {
     if (!m_parent) {
@@ -328,12 +328,12 @@ public:
       // dfile << " " << node << " [shape=box, label=";
       // node->printLabel(dfile, m_string) << "]" << endl;
 
-      dfile << " " << node << " [shape=box,width=.2,height=.2,label=\"" << node->id() << ":" << node->m_leafid << "\"]"
-            << endl;
+      dfile << " " << node << " [shape=box,width=.2,height=.2,label=\"" << SuffixNode::id(node) << ":" << node->m_leafid
+            << "\"]" << endl;
     } else {
       // dfile << " " << node << " [label=";
       // node->printLabel(dfile, m_string) << "]" << endl;
-      dfile << " " << node << " [width=.2,height=.2,label=\"" << node->id() << "\"]" << endl;
+      dfile << " " << node << " [width=.2,height=.2,label=\"" << SuffixNode::id(node) << "\"]" << endl;
     }
   }
 
@@ -404,11 +404,11 @@ public:
   }
 
   void printNodeFlat(ostream &out, SuffixNode *node) {
-    out << node->id() << "\t" << node->m_parent->id() << "\t" << node->m_suffix->id() << "\t" << node->m_start << "\t"
-        << node->m_end << "\t";
+    out << SuffixNode::id(node) << "\t" << SuffixNode::id(node->m_parent) << "\t" << SuffixNode::id(node->m_suffix)
+        << "\t" << node->m_start << "\t" << node->m_end << "\t";
 
     for (int i = 0; i < basecount; i++) {
-      out << node->m_children[i]->id() << "\t";
+      out << SuffixNode::id(node->m_children[i]) << "\t";
     }
 
     out << node->m_start << "\t" << node->m_end << "\t";
@@ -1012,11 +1012,11 @@ TextureAddress arrayToAddress(unsigned char arr[3]) {
 
 void buildNodeTexture(SuffixNode *node, PixelOfNode *nodeTexture, PixelOfChildren *childrenTexture,
                       AuxiliaryNodeData aux_data[], const char *refstr) {
-  int origid = node->id();
+  int origid = SuffixNode::id(node);
 
   aux_data[origid].length = node->len();
   aux_data[origid].numleaves = node->m_numleaves;
-  aux_data[origid].printParent = id2addr(node->m_printParent->id());
+  aux_data[origid].printParent = id2addr(SuffixNode::id(node->m_printParent));
 
   TextureAddress myaddress(id2addr(origid));
 
@@ -1066,11 +1066,11 @@ void buildNodeTexture(SuffixNode *node, PixelOfNode *nodeTexture, PixelOfChildre
   writeAddress(arr, myaddress);
   TextureAddress newaddr = arrayToAddress(arr);
 
-  TextureAddress parent(id2addr(node->m_parent->id()));
+  TextureAddress parent(id2addr(SuffixNode::id(node->m_parent)));
   writeAddress(nd->parent, parent);
   assert(arrayToAddress(nd->parent).data == parent.data);
 
-  TextureAddress suffix(id2addr(node->m_suffix->id()));
+  TextureAddress suffix(id2addr(SuffixNode::id(node->m_suffix)));
   writeAddress(nd->suffix, suffix);
   assert(arrayToAddress(nd->suffix).data == suffix.data);
 
@@ -1103,35 +1103,35 @@ void buildNodeTexture(SuffixNode *node, PixelOfNode *nodeTexture, PixelOfChildre
     cd->leafid[2] = HI3(node->m_leafid);
   } else {
     if (node->m_children[0]) {
-      TextureAddress childaddr = id2addr(node->m_children[0]->id());
+      TextureAddress childaddr = id2addr(SuffixNode::id(node->m_children[0]));
       writeAddress(cd->a, childaddr);
       assert(arrayToAddress(cd->a).data == childaddr.data);
       buildNodeTexture(node->m_children[0], nodeTexture, childrenTexture, aux_data, refstr);
     }
 
     if (node->m_children[1]) {
-      TextureAddress childaddr = id2addr(node->m_children[1]->id());
+      TextureAddress childaddr = id2addr(SuffixNode::id(node->m_children[1]));
       writeAddress(cd->c, childaddr);
       assert(arrayToAddress(cd->c).data == childaddr.data);
       buildNodeTexture(node->m_children[1], nodeTexture, childrenTexture, aux_data, refstr);
     }
 
     if (node->m_children[2]) {
-      TextureAddress childaddr = id2addr(node->m_children[2]->id());
+      TextureAddress childaddr = id2addr(SuffixNode::id(node->m_children[2]));
       writeAddress(cd->g, childaddr);
       assert(arrayToAddress(cd->g).data == childaddr.data);
       buildNodeTexture(node->m_children[2], nodeTexture, childrenTexture, aux_data, refstr);
     }
 
     if (node->m_children[3]) {
-      TextureAddress childaddr = id2addr(node->m_children[3]->id());
+      TextureAddress childaddr = id2addr(SuffixNode::id(node->m_children[3]));
       writeAddress(cd->t, childaddr);
       assert(arrayToAddress(cd->t).data == childaddr.data);
       buildNodeTexture(node->m_children[3], nodeTexture, childrenTexture, aux_data, refstr);
     }
 
     if (node->m_children[4]) {
-      TextureAddress childaddr = id2addr(node->m_children[4]->id());
+      TextureAddress childaddr = id2addr(SuffixNode::id(node->m_children[4]));
       writeAddress(cd->d, childaddr);
       assert(arrayToAddress(cd->d).data == childaddr.data);
       buildNodeTexture(node->m_children[4], nodeTexture, childrenTexture, aux_data, refstr);

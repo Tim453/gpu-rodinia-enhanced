@@ -108,8 +108,8 @@ void ParseCommandLine(int argc, char **argv) {
     static std::string default_ref_s, default_qry_s;
     std::string src_dir(__FILE__);
     src_dir = src_dir.substr(0, src_dir.rfind('/'));
-    default_ref_s = src_dir + "/../../data/mummergpu/NC_003997.fna";
-    default_qry_s = src_dir + "/../../data/mummergpu/NC_003997_q100bp.fna";
+    default_ref_s = src_dir + "/../../../data/mummergpu/NC_003997.fna";
+    default_qry_s = src_dir + "/../../../data/mummergpu/NC_003997_q100bp.fna";
     OPT_reffilename = const_cast<char *>(default_ref_s.c_str());
     OPT_qryfilename = const_cast<char *>(default_qry_s.c_str());
   } else {
