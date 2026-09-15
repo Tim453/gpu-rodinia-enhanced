@@ -25,6 +25,3 @@ This is an enhanced version of the Rodinia Benchmark Suite that has been updated
 
 4. **Running Benchmarks**
    After building, executable binaries will be available in the `build/bin/` directory.
-
-### Note
-OpenCL support is currently under development and will be added in a future update.
